@@ -108,7 +108,6 @@ void InputVector(float x[], int n)
 	for (i = 1; i <= n; ++i)
 	{
 		printf("x[%d]=", i);
-		//scanf_s("%f", &x[i]);
 		cin >> x[i];
 	}
 }
@@ -123,7 +122,6 @@ void InputMatrix(float A[][MAX_N], int m, int n)
 		printf("增广矩阵行数%d : ", i);
 		for (j = 1; j <= n; ++j){
 			cin >> A[i][j];
-			//scanf_s("%f", &A[i][j]);
 		}
 	}
 }
@@ -282,7 +280,6 @@ void Call_SOR(){
 
 	int i, j;
 	printf("输入矩阵维数N:\n");
-	//scanf_s("%d", &n);
 	cin >> n;
 	A = (float **)malloc(sizeof(float)*(n + 1));
 	for (i = 0; i < n + 1; i++){
@@ -293,7 +290,6 @@ void Call_SOR(){
 	for (i = 1; i < n + 1; i++){
 		for (j = 1; j < n + 1; j++){
 			cin >> A[i][j];
-			//scanf_s("%f", &A[i][j]);
 		}
 	}
 	for (i = 1; i < n + 1; i++){
@@ -307,22 +303,18 @@ void Call_SOR(){
 	printf("输入矩阵b:\n");
 	for (i = 1; i < n + 1; i++){
 		cin >> B[i];
-		//scanf_s("%f", &B[i]);
 	}
 	X = (float *)malloc(sizeof(float)*(n + 1));
 
 	printf("输入矩阵x:\n");
 	for (i = 1; i < n + 1; i++){
 		cin >> X[i];
-		//scanf_s("%f", &X[i]);
 	}
 
 	printf("输入最大迭代次数:\n");
 	cin >> c;
-	//scanf_s("%d", &c);
 	printf("输入松弛因子 w(0<w<2):\n");
 	cin >> w;
-	//scanf_s("%f", &w);
 	
 	SOR(X);
 
