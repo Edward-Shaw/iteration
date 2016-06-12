@@ -10,9 +10,9 @@
 #include <stdio.h>
 using namespace std;
 
-#define	MAX_n	 100
+#define	MAX_N	 100
 #define PRECISION	0.000001
-#define MAX_Number	1000
+#define MAX_NUMBER	1000
 
 //求数组中的最大值  
 double MaxOfList(vector<double>x)
@@ -101,19 +101,20 @@ void Call_Jacobi()
 }
 
 //输入初始向量
-void VectorInput(float x[], int n)
+void InputVector(float x[], int n)
 {
 	int i;
 
 	for (i = 1; i <= n; ++i)
 	{
 		printf("x[%d]=", i);
-		scanf_s("%f", &x[i]);
+		//scanf_s("%f", &x[i]);
+		cin >> x[i];
 	}
 }
 
 //输入增广矩阵
-void MatrixInput(float A[][MAX_n], int m, int n)
+void InputMatrix(float A[][MAX_N], int m, int n)
 {
 	int  i, j;
 	printf("\n输入系数矩阵：\n");
@@ -121,13 +122,14 @@ void MatrixInput(float A[][MAX_n], int m, int n)
 	{
 		printf("增广矩阵行数%d : ", i);
 		for (j = 1; j <= n; ++j){
-			scanf_s("%f", &A[i][j]);
+			cin >> A[i][j];
+			//scanf_s("%f", &A[i][j]);
 		}
 	}
 }
 
 //输出向量
-void VectorOutput(float x[], int n)
+void OutputVector(float x[], int n)
 {
 	int i;
 	for (i = 1; i <= n; ++i){
@@ -149,13 +151,13 @@ int IsSatisfyPricision(float x1[], float x2[], int n)
 }
 
 //Gauss-Seidel迭代算法实现
-int GaussSeidel(float A[][MAX_n], float x[], int n)
+int GaussSeidel(float A[][MAX_N], float x[], int n)
 {
-	float x_former[MAX_n];
+	float x_former[MAX_N];
 	int i, j, k;
 
 	printf("\n初始向量x0:\n");
-	VectorInput(x, n);
+	InputVector(x, n);
 
 	k = 0;
 	do{
@@ -181,9 +183,9 @@ int GaussSeidel(float A[][MAX_n], float x[], int n)
 			}
 		}
 		++k;
-	} while (IsSatisfyPricision(x, x_former, n) && k<MAX_Number);
+	} while (IsSatisfyPricision(x, x_former, n) && k<MAX_NUMBER);
 
-	if (k >= MAX_Number){
+	if (k >= MAX_NUMBER){
 		return 1;
 	}
 	else
@@ -199,17 +201,17 @@ void Call_GaussSeide()
 	cout << "您正在执行的迭代算法是: GaussSeide" << endl;
 
 	int n;
-	float A[MAX_n][MAX_n], x[MAX_n];
+	float A[MAX_N][MAX_N], x[MAX_N];
 
 	printf("\n方阵维数n=");
 	scanf_s("%d", &n);
-	if (n >= MAX_n - 1)
+	if (n >= MAX_N - 1)
 	{
-		printf("\n\007n must < %d!", MAX_n);
+		printf("\n\007n must < %d!", MAX_N);
 		exit(0);
 	}
 
-	MatrixInput(A, n, n + 1);
+	InputMatrix(A, n, n + 1);
 
 	if (GaussSeidel(A, x, n)){
 		printf("\nGauss-Seidel迭代失败!");
@@ -217,7 +219,7 @@ void Call_GaussSeide()
 	else
 	{
 		printf("\n结果:");
-		VectorOutput(x, n);
+		OutputVector(x, n);
 	}
 	
 	return;
@@ -229,7 +231,6 @@ void Call_GaussSeide()
 float **A;    /*存放A矩阵*/
 float *B;    /*存放b矩阵*/
 float *X;    /*存放x矩阵*/
-float p;    /*精确度*/
 float w;    /*松弛因子*/
 int n;     /*未知数个数*/
 int c;     /*最大迭代次数*/
@@ -258,15 +259,17 @@ void SOR(float xk[])
 	for (i = 1; i<n + 1; i++)
 	{
 		tt = fabs(xl[i] - xk[i]);
-		tt = tt*tt;
+		tt = tt * tt;
 		t += tt;
 	}
 	t = sqrt(t);
 
-	for (i = 1; i<n + 1; i++)
+	for (i = 1; i<n + 1; i++){
 		xk[i] = xl[i];
+		printf("\nx[%d]=%f", i, xk[i]);
+	}
 
-	if (k + 1 <= c&&t>p)
+	if (k + 1 <= c && t > PRECISION)
 	{
 		k++;
 		SOR(xk);
@@ -279,7 +282,8 @@ void Call_SOR(){
 
 	int i, j;
 	printf("输入矩阵维数N:\n");
-	scanf_s("%d", &n);
+	//scanf_s("%d", &n);
+	cin >> n;
 	A = (float **)malloc(sizeof(float)*(n + 1));
 	for (i = 0; i < n + 1; i++){
 		A[i] = (float*)malloc(sizeof(float)*(n + 1));
@@ -288,7 +292,8 @@ void Call_SOR(){
 	printf("输入矩阵A:\n");
 	for (i = 1; i < n + 1; i++){
 		for (j = 1; j < n + 1; j++){
-			scanf_s("%f", &A[i][j]);
+			cin >> A[i][j];
+			//scanf_s("%f", &A[i][j]);
 		}
 	}
 	for (i = 1; i < n + 1; i++){
@@ -301,25 +306,28 @@ void Call_SOR(){
 	B = (float *)malloc(sizeof(float)*(n + 1));
 	printf("输入矩阵b:\n");
 	for (i = 1; i < n + 1; i++){
-		scanf_s("%f", &B[i]);
+		cin >> B[i];
+		//scanf_s("%f", &B[i]);
 	}
 	X = (float *)malloc(sizeof(float)*(n + 1));
 
 	printf("输入矩阵x:\n");
 	for (i = 1; i < n + 1; i++){
-		scanf_s("%f", &X[i]);
+		cin >> X[i];
+		//scanf_s("%f", &X[i]);
 	}
-	printf("输入精确值:\n");
-	scanf_s("%f", &p);
+
 	printf("输入最大迭代次数:\n");
-	scanf_s("%d", &c);
+	cin >> c;
+	//scanf_s("%d", &c);
 	printf("输入松弛因子 w(0<w<2):\n");
-	scanf_s("%f", &w);
+	cin >> w;
+	//scanf_s("%f", &w);
 	
 	SOR(X);
 
 	printf("\n结果:");
-	VectorOutput(X, n);
+	OutputVector(X, n);
 
 	return;
 }
