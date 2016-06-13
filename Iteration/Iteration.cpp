@@ -8,353 +8,390 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <math.h>
+
 using namespace std;
 
-#define	MAX_N	 100
-#define PRECISION	0.000001
-#define MAX_NUMBER	1000
+#define PRECISION	0.000001  //误差精度e
+#define MAX_NUMBER	100000  //最大迭代次数
+#define N 12 //系数矩阵维数
 
-//求数组中的最大值  
-double MaxOfList(vector<double>x)
-{
-	double max = x[0];
-	int n = x.size();
-	for (int i = 0; i < n; i++){
-		if (x[i] > max){
-			max = x[i];
-		}
-	}
-	return max;
-}
+//获得矩阵A
+void Init_Matrix_A(double A[N][N]){
 
-//雅可比迭代公式算法实现  
-void Jacobi(vector<vector<double> > A, vector<double> B, int n)
-{
-	vector<double> X(n, 0);
-	vector<double> Y(n, 0);
-	vector<double> D(n, 0);
-	int k = 0; //记录循环次数  
-	do{
-		X = Y;
-		for (int i = 0; i<n; i++){
-			double tem = 0;
-			for (int j = 0; j<n; j++){
-				if (i != j) tem += A[i][j] * X[j];
-			}
-			Y[i] = (B[i] - tem) / A[i][i];
-			cout << left << setw(8) << Y[i] << " ";
-		}
-		cout << endl;
-		k++;
-		if (k>100){
-			cout << "迭代失败！（可能是函数不收敛）" << endl;
-			return;
-		}
+	cout << " 矩阵A：" << endl;
 
-		for (int a = 0; a<n; a++){
-			D[a] = X[a] - Y[a];
-		}
-	} while (MaxOfList(D)>0.000001 || MaxOfList(D)<-0.000001);
-
-	return;
-}
-
-//使用雅克比迭代算法解方程组
-void Call_Jacobi()
-{
-	cout << "您正在执行的迭代算法是: Jacobi" << endl;
-	
-	int n;
-	cout << "请输入方程组未知数的个数n：";
-	cin >> n;
-	cout << endl;
-
-	vector<vector<double> >A(n, vector<double>(n, 0));
-	vector<double>B(n, 0);
-
-	cout << "请输入方程组的系数矩阵：" << endl;
-	for (int i = 0; i<n; i++){
-		for (int j = 0; j<n; j++){
-			cin >> A[i][j];
-		}
-	}
-	cout << endl;
-
-	cout << "请输入方程组的值向量：" << endl;
-	for (int k = 0; k<n; k++){
-		cin >> B[k];
-	}
-	cout << endl;
-
-	cout << "您输入的方程组为：" << endl;
-	for (int a = 0; a<n; a++){
-		for (int b = 0; b<n; b++){
-			cout << A[a][b] << " ";
-		}
-		cout << "    " << B[a] << endl;
-	}
-	cout << endl;
-	cout << "由雅可比迭代公式求的方程组的解为：" << endl;
-	Jacobi(A, B, n);
-
-	return;
-}
-
-//输入初始向量
-void InputVector(float x[], int n)
-{
-	int i;
-
-	for (i = 1; i <= n; ++i)
+	for (int i = 0; i < N; i++)
 	{
-		printf("x[%d]=", i);
-		cin >> x[i];
-	}
-}
-
-//输入增广矩阵
-void InputMatrix(float A[][MAX_N], int m, int n)
-{
-	int  i, j;
-	printf("\n输入系数矩阵：\n");
-	for (i = 1; i <= m; ++i)
-	{
-		printf("增广矩阵行数%d : ", i);
-		for (j = 1; j <= n; ++j){
-			cin >> A[i][j];
-		}
-	}
-}
-
-//输出向量
-void OutputVector(float x[], int n)
-{
-	int i;
-	for (i = 1; i <= n; ++i){
-		printf("\nx[%d]=%f", i, x[i]);
-	}
-}
-
-//判断是否在规定精度内
-int IsSatisfyPricision(float x1[], float x2[], int n)
-{
-	int i;
-
-	for (i = 1; i <= n; ++i){
-		if (fabs(x1[i] - x2[i]) > PRECISION) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-//Gauss-Seidel迭代算法实现
-int GaussSeidel(float A[][MAX_N], float x[], int n)
-{
-	float x_former[MAX_N];
-	int i, j, k;
-
-	printf("\n初始向量x0:\n");
-	InputVector(x, n);
-
-	k = 0;
-	do{
-		for (i = 1; i <= n; ++i)
+		for (int j = 0; j < N; j++)
 		{
-			printf("\nx[%d]=%f", i, x[i]);
-			x_former[i] = x[i];
+			A[i][j] = 1.0 / (i + j + 1);
+			cout << A[i][i] << " ";
 		}
-		printf("\n");
-		for (i = 1; i <= n; ++i)
+	}
+	cout << endl;
+}
+
+//获得值向量B
+void Init_Vector_B(double B[N], double A[N][N]){
+	cout << endl;
+	cout << " 值向量B：" << endl;
+
+	for (int i = 0; i <= (N - 1); i++)
+	{
+		for (int j = 0; j <= (N - 1); j++)
 		{
-			x[i] = A[i][n + 1];
-			for (j = 1; j <= n; ++j){
-				if (j != i){
-					x[i] -= A[i][j] * x[j];
-				}
-				if (fabs(A[i][i]) > PRECISION){
-					x[i] /= A[i][i];
-				}
-				else{
-					return 1;
-				}
-			}
+			B[i] = B[i] + A[i][j];
 		}
-		++k;
-	} while (IsSatisfyPricision(x, x_former, n) && k<MAX_NUMBER);
-
-	if (k >= MAX_NUMBER){
-		return 1;
-	}
-	else
-	{
-		printf("\nGauss-Seidel迭代次数为%d 次", k);
-		return 0;
-	}
-}
-
-//使用Gauss-Seidel迭代算法解方程组
-void Call_GaussSeide()
-{
-	cout << "您正在执行的迭代算法是: GaussSeide" << endl;
-
-	int n;
-	float A[MAX_N][MAX_N], x[MAX_N];
-
-	printf("\n方阵维数n=");
-	scanf_s("%d", &n);
-	if (n >= MAX_N - 1)
-	{
-		printf("\n\007n must < %d!", MAX_N);
-		exit(0);
+		cout << B[i] << " ";
 	}
 
-	InputMatrix(A, n, n + 1);
-
-	if (GaussSeidel(A, x, n)){
-		printf("\nGauss-Seidel迭代失败!");
-	}
-	else
-	{
-		printf("\n结果:");
-		OutputVector(x, n);
-	}
-	
-	return;
-}
-
-/*
- * SOR迭代过程中需要的变量
- */
-float **A;    /*存放A矩阵*/
-float *B;    /*存放b矩阵*/
-float *X;    /*存放x矩阵*/
-float w;    /*松弛因子*/
-int n;     /*未知数个数*/
-int c;     /*最大迭代次数*/
-int k = 1;    /*实际迭代次数*/
-
-//超松弛迭代SOR算法具体实现(C风格实现)
-void SOR(float xk[])
-{
-	int i, j;
-	float t = 0.0;
-	float tt = 0.0;
-	float *xl;
-	xl = (float *)malloc(sizeof(float)*(n + 1));
-	for (i = 1; i<n + 1; i++)
-	{
-		t = 0.0;
-		tt = 0.0;
-		for (j = 1; j<i; j++)
-			t = t + A[i][j] * xl[j];
-		for (j = i; j<n + 1; j++)
-			tt = tt + A[i][j] * xk[j];
-		xl[i] = xk[i] + w*(B[i] - t - tt) / A[i][i];
-	}
-
-	t = 0.0;
-	for (i = 1; i<n + 1; i++)
-	{
-		tt = fabs(xl[i] - xk[i]);
-		tt = tt * tt;
-		t += tt;
-	}
-	t = sqrt(t);
-
-	for (i = 1; i<n + 1; i++){
-		xk[i] = xl[i];
-		printf("\nx[%d]=%f", i, xk[i]);
-	}
-
-	if (k + 1 <= c && t > PRECISION)
-	{
-		k++;
-		SOR(xk);
-	}
-}
-
-//使用SOR迭代算法解方程组（w = 1, 1.25, 1.5）
-void Call_SOR(){
-	cout << "您正在执行的迭代算法是: SOR" << endl;
-
-	int i, j;
-	printf("输入矩阵维数N:\n");
-	cin >> n;
-	A = (float **)malloc(sizeof(float)*(n + 1));
-	for (i = 0; i < n + 1; i++){
-		A[i] = (float*)malloc(sizeof(float)*(n + 1));
-	}
-
-	printf("输入矩阵A:\n");
-	for (i = 1; i < n + 1; i++){
-		for (j = 1; j < n + 1; j++){
-			cin >> A[i][j];
-		}
-	}
-	for (i = 1; i < n + 1; i++){
-		for (j = 1; j < n; j++){
-			if (A[i][j] == 0){
-				printf("a[%d][%d]不能为0\n", i, j);
-			}
-		}
-	}
-	B = (float *)malloc(sizeof(float)*(n + 1));
-	printf("输入矩阵b:\n");
-	for (i = 1; i < n + 1; i++){
-		cin >> B[i];
-	}
-	X = (float *)malloc(sizeof(float)*(n + 1));
-
-	printf("输入矩阵x:\n");
-	for (i = 1; i < n + 1; i++){
-		cin >> X[i];
-	}
-
-	printf("输入最大迭代次数:\n");
-	cin >> c;
-	printf("输入松弛因子 w(0<w<2):\n");
-	cin >> w;
-	
-	SOR(X);
-
-	printf("\n结果:");
-	OutputVector(X, n);
-
-	return;
+	cout << endl;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	string method;  //迭代算法
-	string keepGoing;  //程序执行标识
-	do{
-		cout << "请输入迭代算法，Jacobi、Gauss-Seidel或者SOR（输入以回车键结束）：";
-		cin >> method;
-		cout << endl;
-		if (method.find("Jacobi") != string::npos){
-			Call_Jacobi();
+	//存放系数矩阵及值向量
+	double A[N][N], B[N];
+
+	//存放不同迭代算法计算后得到的值的变量
+	double Jacobi[N], Jacobi_Temp[N], GaussSeidel[N], SOR_1[N], SOR_2[N], SOR_3[N];
+
+	//存放迭代误差的变量
+	double Jacobi_e[N], GaussSeidel_e[N], SOR1_e[N], SOR2_e[N], SOR3_e[N];
+	
+	int Iteration_Count = 0;  //迭代次数
+	double a, a1;  //存放矩阵值的临时变量
+	bool stop = false;
+	
+	cout << endl;
+	cout << "当前系数矩阵维数为，N = " << N << endl;
+	cout << endl;
+	//计算并获取系数矩阵A
+	Init_Matrix_A(A);
+	
+	//对变量进行初始化
+	for (int i = 0; i < N; i++)
+	{
+		Jacobi[i] = 0;
+		Jacobi_Temp[i] = 0;
+		GaussSeidel[i] = 0;
+		SOR_1[i] = 0;
+		SOR_2[i] = 0;
+		SOR_3[i] = 0;
+		B[i] = 0;
+	}
+
+	//计算并获取值向量B
+	Init_Vector_B(B, A);
+
+	//Jacobi迭代
+	while (true)
+	{
+		for (int u = 0; u < N; u++)
+		{
+			a = 0;
+			for (int j = 0; j < N; j++)
+			{
+				if (u == j)
+				{
+					continue;
+				}
+				a = a + A[u][j] * Jacobi[j];
+			}
+			Jacobi_Temp[u] = (B[u] - a) / A[u][u];
 		}
-		else if (method.find("Gauss-Seide") != string::npos){
-			Call_GaussSeide();
+
+		Iteration_Count = Iteration_Count + 1;
+
+		for (int i = 0; i < N; i++)
+		{
+			Jacobi_e[i] = Jacobi[i] - Jacobi_Temp[i];
+			Jacobi_e[i] = fabs(Jacobi_e[i]);
 		}
-		else if (method.find("SOR") != string::npos){
-			Call_SOR();
+
+		for (int i = 0; i < N; i++)
+		{
+			if (Jacobi_e[i] >= PRECISION)
+			{
+				stop = false;
+				break;
+			}
+			else{
+				stop = true;
+			}
 		}
-		else{
-			cout << "你的输入是：" << method << " ，程序无法理解您当前的输入..." << endl;
+
+		for (int i = 0; i < N; i++){
+			Jacobi[i] = Jacobi_Temp[i];
 		}
-		cout << endl;
-		cout << "请输入'quit'退出程序或者输入其他任意字符继续执行其他迭代算法" << endl;
-		cin >> keepGoing;
-		if (keepGoing.find("quit") != string::npos){
+
+		if (stop || (Iteration_Count >= MAX_NUMBER)){
 			break;
 		}
-	} while (true);
-	
-	printf("\n\n\007 迭代执行完毕，按任意键退出程序!\n");
+	}
 
-	system("PAUSE");
+	//显示输出
+	cout << endl;
+	cout << "****************************** Output ******************************" << endl;
+	cout << endl;
 
-	return 0;
+	//Jacobi输出
+	if (Iteration_Count >= MAX_NUMBER)
+	{
+		cout << " Jacobi 迭代结果：不收敛" << endl;
+	}
+	else
+	{
+		cout << " Jacobi 迭代结果：" << endl;
+		for (int i = 0; i < N; i++)
+		{
+			cout << Jacobi[i] << endl;
+		}
+		cout << endl;
+		cout << "迭代次数：" << Iteration_Count << endl;
+	}
+	cout << "----------------------------------" << endl;
+	//重置迭代次数为0
+	Iteration_Count = 0;
+
+	//Gauss-Seidel迭代
+	while (true)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			a = 0;
+			a1 = 0;
+			for (int j = 0; j < N ; j++)
+			{
+				if (i == j){
+					continue;
+				}
+				a = a + A[i][j] * GaussSeidel[j];
+			}
+			a1 = (B[i] - a) / A[i][i];
+			GaussSeidel_e[i] = a1 - GaussSeidel[i];
+			GaussSeidel_e[i] = fabs(GaussSeidel_e[i]);
+			GaussSeidel[i] = a1;
+		}
+
+		Iteration_Count = Iteration_Count + 1;
+
+		for (int u = 0; u < N; u++)
+		{
+			if (GaussSeidel_e[u] >= PRECISION)
+			{
+				stop = false;
+				break;
+			}
+			else{
+				stop = true;
+			}
+		}
+
+		if (stop || (Iteration_Count >= MAX_NUMBER)){
+			break;
+		}
+	}
+
+	//Gauss-Seidel输出
+	if (Iteration_Count >= MAX_NUMBER)
+	{
+		cout << " Gauss-Seidel 迭代结果：不收敛" << endl;
+	}
+	else
+	{
+		cout << endl;
+		cout << " Gauss-Seidel 迭代结果：" << endl;
+		for (int i = 0; i < N; i++)
+		{
+			cout << GaussSeidel[i] << endl;
+		}
+		cout << endl;
+		cout << "迭代次数：" << Iteration_Count << endl;
+	}
+	cout << "----------------------------------" << endl;
+	//重置迭代次数为0
+	Iteration_Count = 0;
+
+	//SQR迭代，w为1
+	while (true)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			a = 0;
+			a1 = 0;
+			for (int j = 0; j < N; j++)
+			{
+				if (i == j){
+					continue;
+				}
+				a = a + A[i][j] * SOR_1[j];
+			}
+			a1 = (B[i] - a) / A[i][i];
+			SOR1_e[i] = a1 - SOR_1[i];
+			SOR1_e[i] = fabs(SOR1_e[i]);
+			SOR_1[i] = a1;
+		}
+
+		Iteration_Count = Iteration_Count + 1;
+
+		for (int u = 0; u < N; u++)
+		{
+			if (SOR1_e[u] >= PRECISION)
+			{
+				stop = false;
+				break;
+			}
+			else{
+				stop = true;
+			}
+		}
+
+		if (stop || (Iteration_Count >= MAX_NUMBER)){
+			break;
+		}
+
+	}
+
+	//SQR输出,w为1
+	if (Iteration_Count >= MAX_NUMBER)
+	{
+		cout << " SQR 迭代, w 为 1 结果：不收敛" << endl;
+	}
+	else
+	{
+		cout << endl;
+		cout << " SQR 迭代, w 为 1 结果：" << endl;
+		for (int i = 0; i < N; i++)
+		{
+			cout << SOR_1[i] << endl;;
+		}
+		cout << endl;
+		cout << "迭代次数：" << Iteration_Count << endl;
+	}
+	cout << "----------------------------------" << endl;
+	//重置迭代次数为0
+	Iteration_Count = 0;
+
+	//SQR迭代，w为1.25
+	while (true)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			a = 0;
+			a1 = 0;
+			for (int j = 0; j < N; j++)
+			{
+				if (i == j){
+					continue;
+				}
+				a = a + A[i][j] * SOR_2[j];
+			}
+			a1 = 1.25*(B[i] - a) - 0.25*SOR_2[i] * A[i][i];
+			SOR2_e[i] = SOR_2[i] - a1 / A[i][i];
+			SOR2_e[i] = fabs(SOR2_e[i]);
+			SOR_2[i] = a1 / A[i][i];
+		}
+
+		Iteration_Count = Iteration_Count + 1;
+
+		for (int u = 0; u < N; u++)
+		{
+			if (SOR2_e[u] > (PRECISION))
+			{
+				stop = false;
+				break;
+			}
+			else{
+				stop = true;
+			}
+		}
+
+		if (stop || (Iteration_Count >= MAX_NUMBER)){
+			break;
+		}
+
+	}
+
+	//SQR输出,w为1.25
+	if (Iteration_Count >= MAX_NUMBER)
+	{
+		cout << " SQR 迭代, w 为 1.25 结果：不收敛" << endl;
+	}
+	else
+	{
+		cout << endl;
+		cout << " SQR 迭代, w 为 1.25 结果：" << endl;
+		for (int i = 0; i < N; i++)
+		{
+			cout << SOR_2[i] << endl;
+		}
+		cout << endl;
+		cout << "迭代次数：" << Iteration_Count << endl;
+	}
+	cout << "----------------------------------" << endl;
+	//重置迭代次数为0
+	Iteration_Count = 0;
+
+	//SQR迭代，w为1.5
+	while (true)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			a = 0;
+			a1 = 0;
+			for (int j = 0; j < N; j++)
+			{
+				if (i == j){
+					continue;
+				}
+				a = a + A[i][j] * SOR_3[j];
+			}
+			a1 = (1 - 1.5)*SOR_3[i] + 1.000 / A[i][i] * 1.5*(B[i] - a);
+			SOR3_e[i] = a1 - SOR_3[i];
+			SOR3_e[i] = fabs(SOR3_e[i]);
+			SOR_3[i] = a1;
+		}
+
+		Iteration_Count = Iteration_Count + 1;
+
+		for (int u = 0; u < N; u++)
+		{
+			if (SOR3_e[u] >= PRECISION)
+			{
+				stop = false;
+				break;
+			}
+			else{
+				stop = true;
+			}
+		}
+
+		if (stop || (Iteration_Count >= MAX_NUMBER)){
+			break;
+		}
+
+	}
+
+	//SQR输出,w为1.5
+	if (Iteration_Count >= MAX_NUMBER)
+	{
+		cout << " SQR 迭代, w 为 1.5 结果：不收敛" << endl;
+	}
+	else
+	{
+		cout << endl;
+		cout << " SQR 迭代, w 为 1.5 结果：" << endl;
+		for (int i = 0; i < N; i++)
+		{
+			cout << SOR_3[i] << endl;
+		}
+		cout << endl;
+		cout << "迭代次数：" << Iteration_Count << endl;
+	}
+	cout << "----------------------------------" << endl;
+	cout << endl;
+	cout <<"程序迭代执行完毕！";
+	system("pause");
 }
